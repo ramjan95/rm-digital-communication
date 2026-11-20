@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RM Digital Communication</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f1f5f9;
+  color: #172554;
+}
+
+header {
+  background: #123b78;
+  color: white;
+  text-align: center;
+  padding: 25px 12px;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 25px;
+}
+
+nav {
+  background: white;
+  padding: 14px;
+  text-align: center;
+}
+
+nav a {
+  color: #123b78;
+  text-decoration: none;
+  margin: 8px;
+  font-weight: bold;
+}
+
+.hero {
+  text-align: center;
+  padding: 35px 15px;
+  background: #dbeafe;
+}
+
+.hero h2 {
+  font-size: 27px;
+}
+
+button {
+  padding: 12px 22px;
+  background: #123b78;
+  color: white;
+  border: none;
+  border-radius: 7px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.services {
+  padding: 20px;
+  text-align: center;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(140px,1fr));
+  gap: 15px;
+}
+
+.card {
+  background: white;
+  padding: 22px 10px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #ddd;
+}
+
+.card h3 {
+  font-size: 17px;
+}
+
+.contact {
+  text-align: center;
+  padding: 30px 15px;
+  background: #dbeafe;
+}
+
+form {
+  max-width: 500px;
+  margin: auto;
+  text-align: left;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+form input,
+form select,
+form textarea {
+  width: 100%;
+  padding: 14px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+form button {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.whatsapp {
+  display: inline-block;
+  background: #16a34a;
+  color: white;
+  padding: 14px 22px;
+  text-decoration: none;
+  border-radius: 8px;
+  margin-top: 12px;
+}
+
+footer {
+  background: #123b78;
+  color: white;
+  text-align: center;
+  padding: 18px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>RM DIGITAL COMMUNICATION</h1>
+<p>Owner: রমজান মন্ডল</p>
+</header>
+
+<nav>
+<a href="#home">Home</a>
+<a href="#services">Service order</a>
+<a href="#customer-request">Service Request</a>
+<a href="#contact">Contact</a>
+<a href="admin.html">Admin Login</a>
+</nav>
+
+<section class="hero" id="home">
+<h2>Welcome to RM Digital Communication</h2>
+<p>আপনার সকল ডিজিটাল পরিষেবা এখন এক জায়গায়।</p>
+
+<button onclick="changeLanguage()" id="langBtn">
+English
+</button>
+</section>
+
+<section class="services" id="services">
+<h2>আমাদের পরিষেবা / Our Services</h2>
+
+<div class="cards">
+<div class="card">
+<h3>🌐 Website</h3>
+<p>ওয়েবসাইট তৈরি</p>
+</div>
+
+<div class="card">
+<h3>📱 Mobile App</h3>
+<p>মোবাইল অ্যাপ পরিষেবা</p>
+</div>
+
+<div class="card">
+<h3>🖨️ Online Form</h3>
+<p>অনলাইন ফর্ম পূরণ</p>
+</div>
+
+<div class="card">
+<h3>📄 Document</h3>
+<p>ডকুমেন্ট পরিষেবা</p>
+</div>
+
+<div class="card">
+<h3>🎨 Design</h3>
+<p>পোস্টার ও ডিজাইন</p>
+</div>
+
+<div class="card">
+<h3>💻 Computer</h3>
+<p>কম্পিউটার পরিষেবা</p>
+</div>
+</div>
+</section>
+
+<!-- CUSTOMER SERVICE REQUEST -->
+
+<section class="contact" id="customer-request">
+
+<h2>Customer Service Request</h2>
+<p>আপনার প্রয়োজনীয় পরিষেবার জন্য আবেদন করুন</p>
+
+<form id="serviceRequestForm">
+
+<label>Customer Name</label>
+<input type="text" id="customer_name"
+placeholder="আপনার নাম লিখুন" required>
+
+<label>Mobile Number</label>
+<input type="tel" id="phone"
+placeholder="আপনার মোবাইল নম্বর" required>
+
+<label>Service Type</label>
+<select id="service_type" required>
+<option value="">Select Service</option>
+<option>Website</option>
+<option>Mobile App</option>
+<option>Online Form</option>
+<option>Document</option>
+<option>Design</option>
+<option>Computer</option>
+<option>Other</option>
+</select>
+
+<label>Message</label>
+<textarea id="message"
+placeholder="আপনার প্রয়োজন লিখুন"></textarea>
+
+<button type="submit">Submit Request</button>
+
+<p id="requestMessage"></p>
+
+</form>
+</section>
+
+<!-- ONLINE SERVICE ORDER -->
+
+<section id="order" style="padding:30px; background:#eaf2ff;">
+
+<h2 style="text-align:center;">
+অনলাইন সার্ভিস অর্ডার / Service Order
+</h2>
+
+<form id="serviceForm">
+
+<label>Your Name</label>
+<input type="text" id="customerName"
+placeholder="আপনার নাম / Your Name" required>
+
+<label>Mobile Number</label>
+<input type="tel" id="customerPhone"
+placeholder="মোবাইল নম্বর / Mobile Number" required>
+
+<label>Service Type</label>
+<select id="serviceType" required>
+<option value="">পরিষেবা নির্বাচন করুন</option>
+<option>Website</option>
+<option>Mobile App</option>
+<option>Online Form</option>
+<option>Document</option>
+<option>Design</option>
+<option>Computer</option>
+</select>
+
+<label>Details</label>
+<textarea id="details"
+placeholder="কী কাজ করাতে চান লিখুন"></textarea>
+
+<button type="submit"
+style="background:green;">
+Submit Order
+</button>
+
+<p id="orderMessage"></p>
+
+</form>
+</section>
+
+<!-- CONTACT -->
+
+<section class="contact" id="contact">
+
+<h2>যোগাযোগ করুন</h2>
+<p>WhatsApp: 9733995855</p>
+
+<a class="whatsapp"
+href="https://wa.me/919733995855"
+target="_blank">
+WhatsApp করুন
+</a>
+
+</section>
+
+<footer>
+<p>© 2026 RM Digital Communication</p>
+<p>Owner: Ramjan Mondal</p>
+</footer>
+
+<!-- LANGUAGE SCRIPT -->
+
+<script>
+let english = false;
+
+function changeLanguage() {
+  english = !english;
+
+  document.querySelector(".hero p").innerText =
+    english
+    ? "All your digital services in one place."
+    : "আপনার সকল ডিজিটাল পরিষেবা এখন এক জায়গায়।";
+
+  document.getElementById("langBtn").innerText =
+    english ? "বাংলা" : "English";
+}
+</script>
+
+<!-- SUPABASE CONNECTION AND FORMS -->
+
+<script type="module">
+
+import { supabase } from './js-supabase-config.js';
+
+
+// SERVICE REQUEST FORM
+
+const requestForm =
+document.getElementById('serviceRequestForm');
+
+requestForm.addEventListener('submit', async function(e) {
+
+  e.preventDefault();
+
+  const result =
+  document.getElementById('requestMessage');
+
+  const submitBtn =
+  requestForm.querySelector('button[type="submit"]');
+
+  const name =
+  document.getElementById('customer_name').value.trim();
+
+  const phone =
+  document.getElementById('phone').value.trim();
+
+  const service =
+  document.getElementById('service_type').value;
+
+  const message =
+  document.getElementById('message').value.trim();
+
+  submitBtn.disabled = true;
+  result.textContent = 'Submitting Request...';
+
+  try {
+
+    const { error } = await supabase
+      .from('service_requests')
+      .insert([{
+        customer_name: name,
+        phone: phone,
+        service: service,
+        message: message,
+        status: 'Pending'
+      }]);
+
+    if (error) {
+      throw error;
+    }
+
+    result.textContent =
+    'Service Request Submitted Successfully!';
+
+    requestForm.reset();
+
+  } catch(error) {
+
+    result.textContent =
+    'Error: ' + error.message;
+
+  } finally {
+
+    submitBtn.disabled = false;
+
+  }
+
+});
+
+
+// ONLINE ORDER FORM
+
+const orderForm =
+document.getElementById('serviceForm');
+
+orderForm.addEventListener('submit', async function(e) {
+
+  e.preventDefault();
+
+  const result =
+  document.getElementById('orderMessage');
+
+  const submitBtn =
+  orderForm.querySelector('button[type="submit"]');
+
+  const name =
+  document.getElementById('customerName').value.trim();
+
+  const phone =
+  document.getElementById('customerPhone').value.trim();
+
+  const service =
+  document.getElementById('serviceType').value;
+
+  const details =
+  document.getElementById('details').value.trim();
+
+  submitBtn.disabled = true;
+  result.textContent = 'Submitting Order...';
+
+  try {
+
+    const { error } = await supabase
+      .from('orders')
+      .insert([{
+        customer_name: name,
+        phone: phone,
+        service: service,
+        message: details,
+        order_status: 'Pending'
+      }]);
+
+    if (error) {
+      throw error;
+    }
+
+    result.textContent =
+    'আপনার অর্ডার সফলভাবে জমা হয়েছে!';
+
+    orderForm.reset();
+
+  } catch(error) {
+
+    result.textContent =
+    'Order Error: ' + error.message;
+
+  } finally {
+
+    submitBtn.disabled = false;
+
+  }
+
+});
+
+</script>
+
+</body>
+</html>
