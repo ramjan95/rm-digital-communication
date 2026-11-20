@@ -1,0 +1,608 @@
+<DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>RM Digital Communication Admin</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f1f5f9;
+  padding: 15px;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+h1, h2 {
+  color: #075985;
+  text-align: center;
+}
+
+input, button, select {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  box-sizing: border-box;
+}
+
+button {
+  background: #075985;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.section {
+  background: white;
+  padding: 15px;
+  margin: 15px auto;
+  max-width: 600px;
+  border-radius: 10px;
+}
+
+.order {
+  background: #e0f2fe;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+
+#message {
+  padding: 10px;
+  color: #075985;
+  overflow-wrap: anywhere;
+}
+  .dashboard-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.summary-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.10);
+  border-left: 5px solid #2563eb;
+}
+
+.summary-card h3 {
+  font-size: 15px;
+  color: #475569;
+  margin-bottom: 12px;
+}
+
+.summary-card h2 {
+  font-size: 28px;
+  color: #1d4ed8;
+  margin: 0;
+}
+</style>
+</head>
+
+<body>
+
+<h1>RM DIGITAL COMMUNICATION</h1>
+
+<div class="container">
+
+<h2>Admin Login</h2>
+
+<input type="email" id="email" placeholder="Admin Email">
+
+<input type="password" id="password" placeholder="Password">
+
+<button id="loginBtn">Login</button>
+
+<button id="logoutBtn">Logout</button>
+
+<div id="message"></div>
+
+</div>
+
+<div class="section">
+
+<h2>Admin Dashboard</h2>
+
+<div class="dashboard-summary">
+
+  <div class="summary-card">
+    <h3>Total Orders</h3>
+    <h2 id="totalOrders">0</h2>
+  </div>
+
+  <div class="summary-card">
+    <h3>Pending Orders</h3>
+    <h2 id="pendingOrders">0</h2>
+  </div>
+
+  <div class="summary-card">
+    <h3>Processing Orders</h3>
+    <h2 id="processingOrders">0</h2>
+  </div>
+
+  <div class="summary-card">
+    <h3>Completed Orders</h3>
+    <h2 id="completedOrders">0</h2>
+  </div>
+
+  <div class="summary-card">
+    <h3>Total Service Requests</h3>
+    <h2 id="totalServices">0</h2>
+  </div>
+
+</div>
+
+<h3>Service Requests</h3>
+
+<button id="loadServiceBtn">Load Service Requests</button>
+
+<div id="serviceRequests">
+No Service Requests Yet
+</div>
+
+<h3>Orders</h3>
+
+<button id="loadOrdersBtn">Load Orders</button>
+
+<div id="orders">
+No Orders Yet
+</div>
+
+<h3>Messages</h3>
+
+<div id="messages">
+No Messages Yet
+</div>
+
+<h3>Admin Login History</h3>
+
+<button id="historyBtn">View Login History</button>
+
+<div id="loginHistory">
+No Login History Yet
+</div>
+
+</div>
+
+<script type="module">
+
+import { supabase } from './js-supabase-config.js';
+
+const message = document.getElementById('message');
+
+const ordersBox = document.getElementById('orders');
+
+const serviceBox = document.getElementById('serviceRequests');
+
+const historyBox = document.getElementById('loginHistory');
+
+let currentLoginHistoryId = null;
+
+
+// LOGIN
+
+document.getElementById('loginBtn').onclick = async () => {
+
+  const email = document.getElementById('email').value.trim();
+
+  const password = document.getElementById('password').value;
+
+  if (!email || !password) {
+    message.textContent = 'Enter Email and Password';
+    return;
+  }
+
+  message.textContent = 'Logging in...';
+
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    message.textContent = 'Login Failed: ' + error.message;
+    return;
+  }
+loadDashboardSummary();
+  const { data: history, error: historyError } = await supabase
+    .from('admin_login_history')
+    .insert({
+      admin_email: data.user.email,
+      login_status: 'Successful'
+    })
+    .select('id')
+    .single();
+
+  if (historyError) {
+
+    currentLoginHistoryId = null;
+
+    message.textContent =
+      'Login Successful, but History Save Failed: ' +
+      historyError.message;
+
+  } else {
+
+    currentLoginHistoryId = history.id;
+
+    message.textContent =
+      'Login Successful. Date & Time Saved!';
+
+  }
+
+};
+
+
+// LOGOUT
+
+document.getElementById('logoutBtn').onclick = async () => {
+
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    message.textContent = 'Already Logged Out';
+    return;
+  }
+
+  if (currentLoginHistoryId !== null) {
+
+    const now = new Date();
+
+    const logoutDate = now.toLocaleDateString('en-CA', {
+      timeZone: 'Asia/Kolkata'
+    });
+
+    const logoutTime = now.toLocaleTimeString('en-GB', {
+      timeZone: 'Asia/Kolkata'
+    });
+
+    const { error } = await supabase
+      .from('admin_login_history')
+      .update({
+        logout_date: logoutDate,
+        logout_time: logoutTime,
+        logout_status: 'Successful'
+      })
+      .eq('id', currentLoginHistoryId);
+
+    if (error) {
+      message.textContent =
+        'Logout History Failed: ' + error.message;
+      return;
+    }
+
+  }
+
+  const { error: logoutError } = await supabase.auth.signOut();
+
+  if (logoutError) {
+    message.textContent = 'Logout Failed: ' + logoutError.message;
+    return;
+  }
+
+  currentLoginHistoryId = null;
+
+  ordersBox.innerHTML = '';
+  serviceBox.innerHTML = '';
+
+  message.textContent = 'Logged Out Successfully';
+
+};
+
+
+// LOAD SERVICE REQUESTS
+
+async function loadServiceRequests() {
+
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    serviceBox.textContent = 'Please Login First';
+    return;
+  }
+
+  serviceBox.textContent = 'Loading Service Requests...';
+
+  const { data, error } = await supabase
+    .from('service_requests')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    serviceBox.textContent = 'Error: ' + error.message;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    serviceBox.textContent = 'No Service Requests Found';
+    return;
+  }
+
+  serviceBox.innerHTML = '';
+
+  data.forEach(item => {
+
+    const div = document.createElement('div');
+    div.className = 'order';
+
+    const info = document.createElement('p');
+
+    info.textContent =
+      'Name: ' + (item.customer_name || '') +
+      ' | Phone: ' + (item.phone || '') +
+      ' | Service: ' + (item.service || '') +
+      ' | Message: ' + (item.message || '');
+
+    div.appendChild(info);
+
+    const label = document.createElement('label');
+
+    label.textContent = 'Service Status: ';
+
+    const select = document.createElement('select');
+
+    ['Pending', 'Processing', 'Completed'].forEach(status => {
+
+      const option = document.createElement('option');
+
+      option.value = status;
+      option.textContent = status;
+
+      select.appendChild(option);
+
+    });
+
+    select.value = item.status || 'Pending';
+
+    select.onchange = async () => {
+
+      const { error } = await supabase
+        .from('service_requests')
+        .update({ status: select.value })
+        .eq('id', item.id);
+
+      if (error) {
+        alert('Status Update Failed: ' + error.message);
+        return;
+      }
+
+      alert('Service Status Updated Successfully');
+await loadDashboardSummary();
+    };
+
+    label.appendChild(select);
+
+    div.appendChild(label);
+
+    serviceBox.appendChild(div);
+
+  });
+
+}
+
+document.getElementById('loadServiceBtn').onclick =
+  loadServiceRequests;
+
+
+async function loadDashboardSummary() {
+
+  const { data: { user } } =
+    await supabase.auth.getUser();
+
+  if (!user) return;
+
+  const { data: orders, error: orderError } =
+    await supabase
+      .from('orders')
+      .select('order_status');
+
+  if (orderError) {
+    alert('Orders Error: ' + orderError.message);
+    return;
+  }
+
+  const total = orders.length;
+
+  const pending = orders.filter(
+    item => (item.order_status || 'Pending').toLowerCase() === 'pending'
+  ).length;
+
+  const processing = orders.filter(
+    item => (item.order_status || '').toLowerCase() === 'processing'
+  ).length;
+
+  const completed = orders.filter(
+    item => (item.order_status || '').toLowerCase() === 'completed'
+  ).length;
+
+  document.getElementById('totalOrders').textContent = total;
+  document.getElementById('pendingOrders').textContent = pending;
+  document.getElementById('processingOrders').textContent = processing;
+  document.getElementById('completedOrders').textContent = completed;
+
+  const { count, error } = await supabase
+    .from('service_requests')
+    .select('*', { count: 'exact', head: true });
+
+  if (error) {
+    alert('Service Requests Error: ' + error.message);
+    return;
+  }
+
+  document.getElementById('totalServices').textContent = count;
+}
+
+// LOAD ORDERS
+
+async function loadOrders() {
+
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    ordersBox.textContent = 'Please Login First';
+    return;
+  }
+
+  ordersBox.textContent = 'Loading Orders...';
+
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    ordersBox.textContent = 'Error: ' + error.message;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    ordersBox.textContent = 'No Orders Found';
+    return;
+  }
+
+  ordersBox.innerHTML = '';
+
+  data.forEach(item => {
+
+    const div = document.createElement('div');
+
+    div.className = 'order';
+
+    const info = document.createElement('p');
+
+    info.textContent =
+      'Name: ' + (item.customer_name || '') +
+      ' | Phone: ' + (item.phone || '') +
+      ' | Service: ' + (item.service || '') +
+      ' | Message: ' + (item.message || '');
+
+    div.appendChild(info);
+
+    const label = document.createElement('label');
+
+    label.textContent = 'Order Status: ';
+
+    const select = document.createElement('select');
+
+    ['Pending', 'Processing', 'Completed'].forEach(status => {
+
+      const option = document.createElement('option');
+
+      option.value = status;
+      option.textContent = status;
+
+      select.appendChild(option);
+
+    });
+
+    select.value = item.order_status || 'Pending';
+
+    select.onchange = async () => {
+
+      const { error } = await supabase
+        .from('orders')
+        .update({ order_status: select.value })
+        .eq('id', item.id);
+
+      if (error) {
+        alert('Order Status Update Failed: ' + error.message);
+        return;
+      }
+
+      alert('Order Status Updated Successfully');
+    await loadDashboardSummary();
+    };
+
+    label.appendChild(select);
+
+    div.appendChild(label);
+
+    ordersBox.appendChild(div);
+
+  });
+
+}
+
+document.getElementById('loadOrdersBtn').onclick =
+  loadOrders;
+
+
+// VIEW LOGIN HISTORY
+
+document.getElementById('historyBtn').onclick = async () => {
+
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    historyBox.textContent = 'Please Login First';
+    return;
+  }
+
+  historyBox.textContent = 'Loading Login History...';
+
+  const { data, error } = await supabase
+    .from('admin_login_history')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    historyBox.textContent = 'Error: ' + error.message;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    historyBox.textContent = 'No Login History Found';
+    return;
+  }
+
+  historyBox.innerHTML = '';
+
+  data.forEach(item => {
+
+    const div = document.createElement('div');
+
+    div.className = 'order';
+
+    const info = document.createElement('p');
+
+    info.textContent =
+      'Email: ' + (item.admin_email || '') +
+      ' | Login Date & Time: ' +
+(item.created_at
+  ? new Date(item.created_at).toLocaleString('en-IN')
+  : '') +
+    ' | Logout Date: ' +
+(item.logout_date || 'Not Logged Out') +
+' | Logout Time: ' +
+(item.logout_time || 'Not Logged Out') +
+      ' | Login Status: ' +
+      (item.login_status || '') +
+      ' | Logout Status: ' +
+      (item.logout_status || '');
+
+    div.appendChild(info);
+
+    historyBox.appendChild(div);
+
+  });
+
+};
+
+</script>
+
+</body>
+</html>
+
